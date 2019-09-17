@@ -17,6 +17,7 @@ from absl import logging
 from tf_agents.drivers import dynamic_step_driver
 from tf_agents.environments import suite_dm_control
 from tf_agents.environments import suite_mujoco
+from tf_agents.environments import suite_pybullet
 from tf_agents.environments import tf_py_environment
 from tf_agents.environments import wrappers
 from tf_agents.eval import metric_utils
@@ -81,7 +82,12 @@ def load_environments(universe, env_name=None, domain_name=None, task_name=None,
   The universe can either be gym, in which case domain_name and task_name are
   ignored, or dm_control, in which case env_name is ignored.
   """
-  if universe == 'gym':
+  if universe == 'gym' or universe == 'pybullet':
+    if universe == 'gym':
+        load = suite_mujoco.load
+    else:
+        load = suite_pybullet.load
+
     tf.compat.v1.logging.info(
         'Using environment {} from {} universe.'.format(env_name, universe))
     gym_env_wrappers = [
@@ -105,9 +111,8 @@ def load_environments(universe, env_name=None, domain_name=None, task_name=None,
                           render_kwargs={'height': observation_render_size,
                                          'width': observation_render_size,
                                          'device_id': 1})]  # segfaults if the device is the same as train env
-    py_env = suite_mujoco.load(env_name, gym_env_wrappers=gym_env_wrappers)
-    eval_py_env = suite_mujoco.load(env_name,
-                                    gym_env_wrappers=eval_gym_env_wrappers)
+    py_env = load(env_name, gym_env_wrappers=gym_env_wrappers)
+    eval_py_env = load(env_name, gym_env_wrappers=eval_gym_env_wrappers)
   elif universe == 'dm_control':
     tf.compat.v1.logging.info(
         'Using domain {} and task {} from {} universe.'.format(domain_name,
