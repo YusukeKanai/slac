@@ -63,7 +63,7 @@ FLAGS = flags.FLAGS
 def get_train_eval_dir(root_dir, universe, env_name, domain_name, task_name,
                        experiment_name):
   root_dir = os.path.expanduser(root_dir)
-  if universe == 'gym':
+  if universe == 'gym' or universe == 'pybullet':
     train_eval_dir = os.path.join(root_dir, universe, env_name,
                                   experiment_name)
   elif universe == 'dm_control':
