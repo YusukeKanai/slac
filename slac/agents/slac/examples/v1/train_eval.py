@@ -220,7 +220,7 @@ def pad_and_concatenate_videos(videos):
   return videos
 
 
-def get_control_timestep(py_env):
+def get_control_timestep(universe, py_env):
   if universe == "gym":
     control_timestep = py_env.dt
   elif universe == "pybullet":
@@ -343,7 +343,7 @@ def train_eval(
         observations_whitelist=observations_whitelist,
         action_repeat=action_repeat)
     tf_env = tf_py_environment.TFPyEnvironment(py_env, isolation=True)
-    original_control_timestep = get_control_timestep(eval_py_env)
+    original_control_timestep = get_control_timestep(universe, eval_py_env)
     control_timestep = original_control_timestep * float(action_repeat)
     fps = int(np.round(1.0 / control_timestep))
     render_fps = int(np.round(1.0 / original_control_timestep))
