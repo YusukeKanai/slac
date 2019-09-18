@@ -225,7 +225,7 @@ def get_control_timestep(py_env):
     control_timestep = py_env.dt
   elif universe == "pybullet":
     control_timestep = py_env.scene.dt
-  elif universe == "dm_control"
+  elif universe == "dm_control":
     control_timestep = py_env.control_timestep()
   return control_timestep
 
