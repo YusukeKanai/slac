@@ -221,10 +221,12 @@ def pad_and_concatenate_videos(videos):
 
 
 def get_control_timestep(py_env):
-  try:
-    control_timestep = py_env.dt  # gym
-  except AttributeError:
-    control_timestep = py_env.control_timestep()  # dm_control
+  if universe == "gym":
+    control_timestep = py_env.dt
+  elif universe == "pybullet":
+    control_timestep = py_env.scene.dt
+  elif universe == "dm_control"
+    control_timestep = py_env.control_timestep()
   return control_timestep
 
 
