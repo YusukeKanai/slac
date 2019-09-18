@@ -144,7 +144,10 @@ def load_environments(universe, env_name=None, domain_name=None, task_name=None,
   if action_repeat > 1:
     py_env = wrappers.ActionRepeat(py_env, action_repeat)
     eval_py_env = wrappers.ActionRepeat(eval_py_env, action_repeat)
-
+    
+  py_env.reset()
+  eval_py_env.reset()
+  
   return py_env, eval_py_env
 
 
