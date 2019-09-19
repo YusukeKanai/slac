@@ -40,6 +40,7 @@ from slac.agents.slac import model_distribution_network
 from slac.agents.slac import slac_agent
 from slac.environments import dm_control_wrappers
 from slac.environments import gym_wrappers
+from slac.environments import pybullet_wrappers
 from slac.environments import video_wrapper
 from slac.utils import gif_utils
 
@@ -108,30 +109,26 @@ def load_environments(universe, env_name=None, domain_name=None, task_name=None,
                                          'device_id': 1})]  # segfaults if the device is the same as train env
     py_env = suite_mujoco.load(env_name, gym_env_wrappers=gym_env_wrappers)
     eval_py_env = suite_mujoco.load(env_name, gym_env_wrappers=eval_gym_env_wrappers)
-  if universe == 'pybullet':
+  elif universe == 'pybullet':
     tf.compat.v1.logging.info(
         'Using environment {} from {} universe.'.format(env_name, universe))
     gym_env_wrappers = [
-        functools.partial(gym_wrappers.RenderGymWrapper,
+        functools.partial(gym_wrappers.RenderPyBulletWrapper,
                           render_kwargs={'height': render_size,
-                                         'width': render_size,
-                                         'device_id': 0}),
-        functools.partial(gym_wrappers.PixelObservationsGymWrapper,
+                                         'width': render_size}),
+        functools.partial(gym_wrappers.PixelObservationsPyBulletWrapper,
                           observations_whitelist=observations_whitelist,
                           render_kwargs={'height': observation_render_size,
-                                         'width': observation_render_size,
-                                         'device_id': 0})]
+                                         'width': observation_render_size})]
     eval_gym_env_wrappers = [
-        functools.partial(gym_wrappers.RenderGymWrapper,
+        functools.partial(gym_wrappers.RenderPyBulletWrapper,
                           render_kwargs={'height': render_size,
-                                         'width': render_size,
-                                         'device_id': 1}),
+                                         'width': render_size}),
         # segfaults if the device is the same as train env
-        functools.partial(gym_wrappers.PixelObservationsGymWrapper,
+        functools.partial(gym_wrappers.PixelObservationsPyBulletWrapper,
                           observations_whitelist=observations_whitelist,
                           render_kwargs={'height': observation_render_size,
-                                         'width': observation_render_size,
-                                         'device_id': 1})]  # segfaults if the device is the same as train env
+                                         'width': observation_render_size})]  # segfaults if the device is the same as train env
     py_env = suite_pybullet.load(env_name, gym_env_wrappers=gym_env_wrappers)
     eval_py_env = suite_pybullet.load(env_name, gym_env_wrappers=eval_gym_env_wrappers)
   elif universe == 'dm_control':
