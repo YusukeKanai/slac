@@ -82,12 +82,7 @@ def load_environments(universe, env_name=None, domain_name=None, task_name=None,
   The universe can either be gym, in which case domain_name and task_name are
   ignored, or dm_control, in which case env_name is ignored.
   """
-  if universe == 'gym' or universe == 'pybullet':
-    if universe == 'gym':
-        load = suite_mujoco.load
-    else:
-        load = suite_pybullet.load
-
+  if universe == 'gym':
     tf.compat.v1.logging.info(
         'Using environment {} from {} universe.'.format(env_name, universe))
     gym_env_wrappers = [
@@ -111,8 +106,34 @@ def load_environments(universe, env_name=None, domain_name=None, task_name=None,
                           render_kwargs={'height': observation_render_size,
                                          'width': observation_render_size,
                                          'device_id': 1})]  # segfaults if the device is the same as train env
-    py_env = load(env_name, gym_env_wrappers=gym_env_wrappers)
-    eval_py_env = load(env_name, gym_env_wrappers=eval_gym_env_wrappers)
+    py_env = suite_mujoco.load(env_name, gym_env_wrappers=gym_env_wrappers)
+    eval_py_env = suite_mujoco.load(env_name, gym_env_wrappers=eval_gym_env_wrappers)
+  if universe == 'pybullet':
+    tf.compat.v1.logging.info(
+        'Using environment {} from {} universe.'.format(env_name, universe))
+    gym_env_wrappers = [
+        functools.partial(gym_wrappers.RenderGymWrapper,
+                          render_kwargs={'height': render_size,
+                                         'width': render_size,
+                                         'device_id': 0}),
+        functools.partial(gym_wrappers.PixelObservationsGymWrapper,
+                          observations_whitelist=observations_whitelist,
+                          render_kwargs={'height': observation_render_size,
+                                         'width': observation_render_size,
+                                         'device_id': 0})]
+    eval_gym_env_wrappers = [
+        functools.partial(gym_wrappers.RenderGymWrapper,
+                          render_kwargs={'height': render_size,
+                                         'width': render_size,
+                                         'device_id': 1}),
+        # segfaults if the device is the same as train env
+        functools.partial(gym_wrappers.PixelObservationsGymWrapper,
+                          observations_whitelist=observations_whitelist,
+                          render_kwargs={'height': observation_render_size,
+                                         'width': observation_render_size,
+                                         'device_id': 1})]  # segfaults if the device is the same as train env
+    py_env = suite_pybullet.load(env_name, gym_env_wrappers=gym_env_wrappers)
+    eval_py_env = suite_pybullet.load(env_name, gym_env_wrappers=eval_gym_env_wrappers)
   elif universe == 'dm_control':
     tf.compat.v1.logging.info(
         'Using domain {} and task {} from {} universe.'.format(domain_name,

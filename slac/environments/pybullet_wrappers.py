@@ -10,10 +10,10 @@ import numpy as np
 from tf_agents.environments import wrappers
 
 
-class RenderGymWrapper(wrappers.PyEnvironmentBaseWrapper):
+class RenderPyBulletWrapper(wrappers.PyEnvironmentBaseWrapper):
 
   def __init__(self, gym_env, render_kwargs=None):
-    super(RenderGymWrapper, self).__init__(gym_env)
+    super(RenderPyBulletWrapper, self).__init__(gym_env)
     self._render_kwargs = dict(
         width=64,
         height=64
@@ -30,10 +30,10 @@ class RenderGymWrapper(wrappers.PyEnvironmentBaseWrapper):
       return self._env.render(mode=mode)
 
 
-class PixelObservationsGymWrapper(wrappers.PyEnvironmentBaseWrapper):
+class PixelObservationsPyBulletWrapper(wrappers.PyEnvironmentBaseWrapper):
 
   def __init__(self, gym_env, observations_whitelist=None, render_kwargs=None):
-    super(PixelObservationsGymWrapper, self).__init__(gym_env)
+    super(PixelObservationsPyBulletWrapper, self).__init__(gym_env)
     if observations_whitelist is None:
       self._observations_whitelist = ['state', 'pixels']
     else:
