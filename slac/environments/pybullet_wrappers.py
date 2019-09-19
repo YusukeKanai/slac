@@ -22,10 +22,10 @@ class RenderPyBulletWrapper(wrappers.PyEnvironmentBaseWrapper):
       self._render_kwargs.update(render_kwargs)
 
   def render(self, mode='rgb_array'):
-    self._env._render_width = self._render_kwargs['width']
-    self._env._render_height = self._render_kwargs['height']
     if mode == 'rgb_array':
-      return self._env.sim.render(**self._render_kwargs)[::-1, :, :]
+      self._env._render_width = self._render_kwargs['width']
+      self._env._render_height = self._render_kwargs['height']
+      return self._env.render()[::-1, :, :]
     else:
       return self._env.render(mode=mode)
 
