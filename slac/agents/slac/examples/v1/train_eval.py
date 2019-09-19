@@ -113,17 +113,11 @@ def load_environments(universe, env_name=None, domain_name=None, task_name=None,
     tf.compat.v1.logging.info(
         'Using environment {} from {} universe.'.format(env_name, universe))
     gym_env_wrappers = [
-        functools.partial(pybullet_wrappers.RenderPyBulletWrapper,
-                          render_kwargs={'height': render_size,
-                                         'width': render_size}),
         functools.partial(pybullet_wrappers.PixelObservationsPyBulletWrapper,
                           observations_whitelist=observations_whitelist,
                           render_kwargs={'height': observation_render_size,
                                          'width': observation_render_size})]
     eval_gym_env_wrappers = [
-        functools.partial(pybullet_wrappers.RenderPyBulletWrapper,
-                          render_kwargs={'height': render_size,
-                                         'width': render_size}),
         # segfaults if the device is the same as train env
         functools.partial(pybullet_wrappers.PixelObservationsPyBulletWrapper,
                           observations_whitelist=observations_whitelist,
