@@ -6,4 +6,4 @@ tf-estimator-nightly==1.14.0.dev2019091001
 mujoco-py<2.1,>=2.0
 gym==0.12.1
 git+git://github.com/deepmind/dm_control.git
-PyBullet
+pybullet
