@@ -10,26 +10,6 @@ import numpy as np
 from tf_agents.environments import wrappers
 
 
-class RenderPyBulletWrapper(wrappers.PyEnvironmentBaseWrapper):
-
-  def __init__(self, gym_env, render_kwargs=None):
-    super(RenderPyBulletWrapper, self).__init__(gym_env)
-    self._render_kwargs = dict(
-        width=64,
-        height=64
-    )
-    if render_kwargs is not None:
-      self._render_kwargs.update(render_kwargs)
-
-  def render(self, mode='rgb_array'):
-    if mode == 'rgb_array':
-      self._env._render_width = self._render_kwargs['width']
-      self._env._render_height = self._render_kwargs['height']
-      return self._env.render()[::-1, :, :]
-    else:
-      return self._env.render(mode=mode)
-
-
 class PixelObservationsPyBulletWrapper(wrappers.PyEnvironmentBaseWrapper):
 
   def __init__(self, gym_env, observations_whitelist=None, render_kwargs=None):
@@ -67,7 +47,7 @@ class PixelObservationsPyBulletWrapper(wrappers.PyEnvironmentBaseWrapper):
       elif observation_name == 'pixels':
         self._env._render_width = self._render_kwargs['width']
         self._env._render_height = self._render_kwargs['height']
-        image = self._env.render()[::-1, :, :]
+        image = self._env.render(mode="rgb_array")[::-1, :, :]
         observations['pixels'] = image
       else:
         raise ValueError('observations_whitelist can only have "state" '
