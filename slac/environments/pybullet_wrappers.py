@@ -12,56 +12,55 @@ from tf_agents.environments import wrappers
 
 class PixelObservationsPyBulletWrapper(wrappers.PyEnvironmentBaseWrapper):
 
-  def __init__(self, gym_env, observations_whitelist=None, render_kwargs=None):
-    super(PixelObservationsPyBulletWrapper, self).__init__(gym_env)
-    if observations_whitelist is None:
-      self._observations_whitelist = ['state', 'pixels']
-    else:
-      self._observations_whitelist = observations_whitelist
-    self._render_kwargs = dict(
-        width=64,
-        height=64
-    )
-    if render_kwargs is not None:
-      self._render_kwargs.update(render_kwargs)
+    def __init__(self, gym_env, observations_whitelist=None, render_kwargs=None):
+        super(PixelObservationsPyBulletWrapper, self).__init__(gym_env)
+        if observations_whitelist is None:
+            self._observations_whitelist = ['state', 'pixels']
+        else:
+            self._observations_whitelist = observations_whitelist
+        self._render_kwargs = dict(
+            width=64,
+            height=64
+        )
+        if render_kwargs is not None:
+            self._render_kwargs.update(render_kwargs)
 
-    observation_spaces = collections.OrderedDict()
-    for observation_name in self._observations_whitelist:
-      if observation_name == 'state':
-        observation_spaces['state'] = self._env.observation_space
-      elif observation_name == 'pixels':
-        image_shape = (
-          self._render_kwargs['height'], self._render_kwargs['width'], 3)
-        image_space = gym.spaces.Box(0, 255, shape=image_shape, dtype=np.uint8)
-        observation_spaces['pixels'] = image_space
-      else:
-        raise ValueError('observations_whitelist can only have "state" '
-                         'or "pixels", got %s.' % observation_name)
-    self.observation_space = gym.spaces.Dict(observation_spaces)
+        observation_spaces = collections.OrderedDict()
+        for observation_name in self._observations_whitelist:
+            if observation_name == 'state':
+                observation_spaces['state'] = self._env.observation_space
+            elif observation_name == 'pixels':
+                image_shape = (
+                    self._render_kwargs['height'], self._render_kwargs['width'], 3)
+                image_space = gym.spaces.Box(0, 255, shape=image_shape, dtype=np.uint8)
+                observation_spaces['pixels'] = image_space
+            else:
+                raise ValueError('observations_whitelist can only have "state" '
+                                 'or "pixels", got %s.' % observation_name)
+        self.observation_space = gym.spaces.Dict(observation_spaces)
 
-  def _modify_observation(self, observation):
-    observations = collections.OrderedDict()
-    for observation_name in self._observations_whitelist:
-      if observation_name == 'state':
-        observations['state'] = observation
-      elif observation_name == 'pixels':
-        self._env._render_width = self._render_kwargs['width']
-        self._env._render_height = self._render_kwargs['height']
-        image = self._env.render(mode="rgb_array")[::-1, :, :]
-        observations['pixels'] = image
-      else:
-        raise ValueError('observations_whitelist can only have "state" '
-                         'or "pixels", got %s.' % observation_name)
-    return observations
+    def _modify_observation(self, observation):
+        observations = collections.OrderedDict()
+        for observation_name in self._observations_whitelist:
+            if observation_name == 'state':
+                observations['state'] = observation
+            elif observation_name == 'pixels':
+                self._env.set_render_size(self._render_kwargs['height'], self._render_kwargs['width'])
+                image = self._env.render(mode="rgb_array")[::-1, :, :]
+                observations['pixels'] = image
+            else:
+                raise ValueError('observations_whitelist can only have "state" '
+                                 'or "pixels", got %s.' % observation_name)
+        return observations
 
-  def _step(self, action):
-    observation, reward, done, info = self._env.step(action)
-    observation = self._modify_observation(observation)
-    return observation, reward, done, info
+    def _step(self, action):
+        observation, reward, done, info = self._env.step(action)
+        observation = self._modify_observation(observation)
+        return observation, reward, done, info
 
-  def _reset(self):
-    observation = self._env.reset()
-    return self._modify_observation(observation)
+    def _reset(self):
+        observation = self._env.reset()
+        return self._modify_observation(observation)
 
-  def render(self, mode='rgb_array'):
-    return self._env.render(mode=mode)
+    def render(self, mode='rgb_array'):
+        return self._env.render(mode=mode)

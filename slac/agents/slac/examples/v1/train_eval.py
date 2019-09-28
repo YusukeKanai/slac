@@ -38,6 +38,7 @@ from slac.agents.slac import critic_network
 from slac.agents.slac import compressor_network
 from slac.agents.slac import model_distribution_network
 from slac.agents.slac import slac_agent
+from slac.environments import custom_kuka_bullet_env as kukaEnv
 from slac.environments import dm_control_wrappers
 from slac.environments import gym_wrappers
 from slac.environments import pybullet_wrappers
@@ -239,7 +240,7 @@ def get_control_timestep(universe, py_env):
   if universe == "gym":
     control_timestep = py_env.dt
   elif universe == "pybullet":
-    control_timestep = py_env.scene.dt
+    control_timestep = py_env.get_time_step()
   elif universe == "dm_control":
     control_timestep = py_env.control_timestep()
   return control_timestep
@@ -704,6 +705,7 @@ def train_eval(
 
 
 def main(argv):
+  kukaEnv.register_environment()
   tf.compat.v1.enable_resource_variables()
   FLAGS(argv)  # raises UnrecognizedFlagError for undefined flags
   tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
